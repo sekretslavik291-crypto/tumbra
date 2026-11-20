@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tumbra</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a1220'/%3E%3Ccircle cx='32' cy='32' r='20' fill='%232578e8'/%3E%3Cpath d='M22 23h20v5.5h-7V42h-6V28.5h-7z' fill='%23ffffff'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #080f1c;
+      --surface: #0f1a2e;
+      --surface-2: #162540;
+      --surface-3: #1e3254;
+      --ink: #eef4fc;
+      --muted: #8399b8;
+      --blue: #2578e8;
+      --blue-bright: #3b8ef7;
+      --blue-soft: rgba(37, 120, 232, 0.16);
+      --shade-2: #1d5ec4;
+      --shade-3: #4ea5ff;
+      --owner: #e5a93c;
+      --owner-soft: rgba(229, 169, 60, 0.15);
+      --danger: #e05252;
+      --danger-soft: rgba(224, 82, 82, 0.16);
+      --border: rgba(120, 165, 225, 0.14);
+      --font-size: 14.5px;
+      --gap: 14px;
+      --radius: 14px;
+    }
+
+    body[data-theme="cobalt"] {
+      --bg: #071124;
+      --surface: #0d1d3b;
+      --surface-2: #132952;
+      --surface-3: #1b386e;
+      --blue: #1f6feb;
+      --blue-bright: #388bfd;
+      --blue-soft: rgba(31, 111, 235, 0.18);
+      --shade-2: #1752c2;
+      --shade-3: #58a6ff;
+    }
+
+    body[data-theme="steel"] {
+      --bg: #0a1018;
+      --surface: #111b28;
+      --surface-2: #182638;
+      --surface-3: #21344c;
+      --blue: #2b7de9;
+      --blue-bright: #4393fc;
+      --blue-soft: rgba(43, 125, 233, 0.15);
+      --shade-2: #1f60b8;
+      --shade-3: #64acff;
+    }
+
+    body[data-font="sm"] { --font-size: 13px; }
+    body[data-font="md"] { --font-size: 14.5px; }
+    body[data-font="lg"] { --font-size: 16.5px; }
+
+    body[data-density="compact"] { --gap: 9px; }
+    body[data-density="normal"] { --gap: 14px; }
+    body[data-density="airy"] { --gap: 20px; }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(37, 120, 232, 0.14), transparent 45%),
+        var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      font-size: var(--font-size);
+      line-height: 1.45;
+      min-height: 100vh;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 16px 16px 64px;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: var(--gap);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--blue-soft);
+      border: 1px solid rgba(59, 142, 247, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--blue-bright);
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .top-meta {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .meta-tag strong {
+      color: var(--shade-3);
+    }
+
+    .tg-verified {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--blue-bright);
+      color: #ffffff;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    .tg-verified svg {
+      width: 11px;
+      height: 11px;
+      display: block;
+    }
+
+    .owner-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 22px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--owner-soft);
+      border: 1px solid rgba(229, 169, 60, 0.42);
+      color: var(--owner);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .identity-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: background-color 0.14s ease, border-color 0.14s ease;
+    }
+
+    .btn:hover {
+      background: var(--surface-3);
+      border-color: rgba(78, 165, 255, 0.35);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-bright);
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      color: #f39b9b;
+      border-color: rgba(224, 82, 82, 0.32);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .auth-panel {
+      max-width: 410px;
+      margin: 44px auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .auth-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .auth-switch button {
+      border: none;
+      background: transparent;
+      padding: 8px;
+      border-radius: 7px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .auth-switch button.active {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    .field {
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .input, select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .input:focus, select:focus {
+      border-color: var(--blue-bright);
+    }
+
+    .alert {
+      margin-top: 11px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .alert.err {
+      display: block;
+      background: var(--danger-soft);
+      color: #f39b9b;
+    }
+
+    .alert.ok {
+      display: block;
+      background: var(--blue-soft);
+      color: var(--shade-3);
+    }
+
+    .workspace {
+      display: none;
+      grid-template-columns: 245px minmax(0, 1fr) 275px;
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .workspace.show {
+      display: grid;
+    }
+
+    @media (max-width: 1060px) {
+      .workspace.show {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 15px;
+      margin-bottom: var(--gap);
+    }
+
+    .box-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--shade-3);
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .menu-btn {
+      width: 100%;
+      text-align: left;
+      padding: 9px 11px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .menu-btn:hover {
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+
+    .menu-btn.active {
+      background: var(--blue-soft);
+      color: var(--shade-3);
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+
+    .member-row:hover {
+      background: var(--surface-2);
+    }
+
+    .member-row.selected {
+      background: var(--surface-2);
+      border-color: rgba(59, 142, 247, 0.45);
+    }
+
+    .member-handle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .member-time {
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Чат */
+    .chat-card {
+      display: flex;
+      flex-direction: column;
+      height: 430px;
+    }
+
+    .chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 2px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .msg-bubble.own {
+      align-self: flex-end;
+      background: var(--shade-2);
+      color: #ffffff;
+    }
+
+    .msg-bubble.notice {
+      align-self: center;
+      max-width: 92%;
+      background: var(--blue-soft);
+      border: 1px solid rgba(78, 165, 255, 0.35);
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .msg-time {
+      font-size: 10.5px;
+      opacity: 0.72;
+      margin-top: 3px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Звонок */
+    .call-bar {
+      background: var(--surface-2);
+      border: 1px solid rgba(59, 142, 247, 0.4);
+      border-radius: var(--radius);
+      padding: 13px 15px;
+      margin-bottom: var(--gap);
+      display: none;
+    }
+
+    .call-bar.active {
+      display: block;
+    }
+
+    .call-bar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .video-frame {
+      display: none;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #06090f;
+      max-height: 220px;
+    }
+
+    .video-frame.show {
+      display: block;
+    }
+
+    .video-frame video {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .call-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Лента сторис в стиле Facebook (текст + картинка) */
+    .feed-composer {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .feed-composer-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      align-items: center;
+    }
+
+    .feed-img-preview {
+      margin-top: 10px;
+      max-height: 200px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      border: 1px solid var(--border);
+    }
+
+    .feed-img-preview.show {
+      display: block;
+    }
+
+    .feed-img-preview img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .feed-post {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px;
+      margin-bottom: 12px;
+    }
+
+    .feed-post-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .feed-post-text {
+      font-size: 14.5px;
+      margin-bottom: 9px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .feed-post-img {
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .feed-post-meta {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    /* Отдельный блок стикеров сбоку */
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .sticker-tile {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--shade-3);
+    }
+
+    .sticker-tile:hover {
+      background: var(--surface-3);
+      border-color: var(--blue-bright);
+    }
+
+    .sticker-tile svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .admin-user-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 11px 13px;
+      margin-bottom: 9px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body data-theme="default" data-font="md" data-density="normal">
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">T</div>
+        <div class="brand-name">Tumbra</div>
+      </div>
+      <div class="top-meta" id="topMeta"></div>
+    </header>
+
+    <!-- ВХОД И РЕГИСТРАЦИЯ -->
+    <section class="auth-panel" id="authPanel">
+      <div class="auth-switch">
+        <button type="button" class="active" id="switchLogin">Вход</button>
+        <button type="button" id="switchReg">Регистрация</button>
+      </div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginUser">Никнейм</label>
+          <input class="input" id="loginUser" type="text" placeholder="Creator" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="loginPass">Пароль</label>
+          <input class="input" id="loginPass" type="password" placeholder="Введите пароль" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+        <div class="alert" id="loginAlert"></div>
+      </form>
+
+      <form id="regForm" class="hidden">
+        <div class="field">
+          <label for="regUser">Никнейм</label>
+          <input class="input" id="regUser" type="text" placeholder="Придумайте свободный ник" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="regTz">Часовой пояс</label>
+          <select id="regTz">
+            <option value="Europe/Riga">Латвия (Рига / Елгава)</option>
+            <option value="Europe/Moscow">Москва (МСК)</option>
+            <option value="Europe/Berlin">Берлин (CET/CEST)</option>
+            <option value="Europe/London">Лондон (GMT/BST)</option>
+            <option value="America/New_York">Нью-Йорк (EST/EDT)</option>
+            <option value="Asia/Tokyo">Токио (JST)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="regPass1">Пароль (ввод 1)</label>
+          <input class="input" id="regPass1" type="password" placeholder="Минимум 4 символа" autocomplete="new-password" required />
+        </div>
+        <div class="field">
+          <label for="regPass2">Пароль (ввод 2)</label>
+          <input class="input" id="regPass2" type="password" placeholder="Повторите пароль" autocomplete="new-password" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+        <div class="alert" id="regAlert"></div>
+      </form>
+    </section>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+    <main class="workspace" id="workspace">
+      <!-- Левая колонка -->
+      <aside>
+        <div class="box">
+          <div class="box-title">Разделы</div>
+          <div class="menu-list">
+            <button type="button" class="menu-btn active" data-section="chat">Чат</button>
+            <button type="button" class="menu-btn" data-section="stories">Лента и сторис</button>
+            <button type="button" class="menu-btn" data-section="people">Люди</button>
+            <button type="button" class="menu-btn" data-section="settings">Оформление</button>
+            <button type="button" class="menu-btn hidden" id="adminMenuBtn" data-section="admin">Admin Panel</button>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">Контакты</div>
+          <div id="contactsList"></div>
+        </div>
+      </aside>
+
+      <!-- Центральная колонка -->
+      <section>
+        <div class="call-bar" id="callBar">
+          <div class="call-bar-top">
+            <span id="callStatusTitle">Звонок</span>
+            <span id="callClock" style="font-variant-numeric: tabular-nums;">00:00</span>
+          </div>
+          <div class="video-frame" id="videoFrame">
+            <video id="localCam" autoplay muted playsinline></video>
+          </div>
+          <div class="call-controls">
+            <button type="button" class="btn btn-sm" id="btnMic">Микрофон: вкл</button>
+            <button type="button" class="btn btn-sm" id="btnCam">Камера: выкл</button>
+            <button type="button" class="btn btn-danger btn-sm" id="btnHangup">Завершить</button>
+          </div>
+        </div>
+
+        <!-- 1. Чат -->
+        <div id="section-chat">
+          <div class="box chat-card">
+            <div class="chat-log" id="chatLog"></div>
+            <form class="chat-input-row" id="chatSendForm">
+              <input class="input" id="chatText" type="text" placeholder="Сообщение..." required />
+              <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 2. Лента и сторис (как лента Facebook: текст + картинка; лимит 35 мин для обычных, без лимита для Creator) -->
+        <div id="section-stories" class="hidden">
+          <div class="box">
+            <div class="box-title">Лента и сторис</div>
+
+            <form class="feed-composer" id="storyPostForm">
+              <input class="input" id="storyText" type="text" maxlength="240" placeholder="Что нового? Напишите текст или добавьте картинку..." />
+              <div class="feed-composer-row">
+                <input type="file" id="storyFile" accept="image/*" style="display: none;" />
+                <button type="button" class="btn btn-sm" id="storyPickImgBtn">Картинка</button>
+                <span id="storyFileName" class="member-time">Файл не выбран</span>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-left: auto;">Опубликовать</button>
+              </div>
+              <div class="feed-img-preview" id="storyImgPreview">
+                <img id="storyImgPreviewTag" alt="Предпросмотр" />
+              </div>
+              <div class="alert" id="storyAlert"></div>
+            </form>
+
+            <div id="storiesFeedList"></div>
+          </div>
+        </div>
+
+        <!-- 3. Люди -->
+        <div id="section-people" class="hidden">
+          <div class="box">
+            <div class="box-title">Пользователи</div>
+            <input class="input" id="peopleFilter" type="search" placeholder="Поиск по никнейму..." style="margin-bottom: 10px;" />
+            <div id="peopleDirectory"></div>
+          </div>
+        </div>
+
+        <!-- 4. Оформление -->
+        <div id="section-settings" class="hidden">
+          <div class="box">
+            <div class="box-title">Оформление</div>
+            <div class="field">
+              <label for="optTheme">Синий оттенок</label>
+              <select id="optTheme">
+                <option value="default">Глубокий синий</option>
+                <option value="cobalt">Кобальтовый</option>
+                <option value="steel">Стальной синий</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="optFont">Размер текста</label>
+              <select id="optFont">
+                <option value="sm">Малый</option>
+                <option value="md">Средний</option>
+                <option value="lg">Крупный</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="optDensity">Плотность</label>
+              <select id="optDensity">
+                <option value="compact">Компактная</option>
+                <option value="normal">Обычная</option>
+                <option value="airy">Свободная</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. ADMIN PANEL -->
+        <div id="section-admin" class="hidden">
+          <div class="box">
+            <div class="box-title">
+              <span>Admin Panel</span>
+              <span class="owner-badge">OWNER</span>
+            </div>
+
+            <form class="field" id="adminNoticeForm">
+              <label for="adminNoticeInput">Объявление во все чаты от Creator</label>
+              <div style="display: flex; gap: 8px;">
+                <input class="input" id="adminNoticeInput" type="text" placeholder="Текст объявления..." required />
+                <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
+              </div>
+            </form>
+
+            <div id="adminUserList"></div>
+
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm" id="adminClearStories">Очистить ленту</button>
+              <button type="button" class="btn btn-danger btn-sm" id="adminResetAll">Сбросить данные</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Правая колонка: Отдельный блок стикеров + Время участников -->
+      <aside>
+        <div class="box">
+          <div class="box-title">Стикеры</div>
+          <div class="sticker-grid" id="stickersPanel"></div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">Время участников</div>
+          <div id="clocksList"></div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const STORE_KEY = "tumbra_feed_stickers_v3";
+    const STORY_COOLDOWN_MS = 35 * 60 * 1000;
+
+    const CHECKMARK_SVG = `<span class="tg-verified" title="Подтверждённый аккаунт" aria-label="Подтверждённый аккаунт"><svg viewBox="0 0 12 12" fill="none"><path d="M2.3 6.2L4.8 8.7L9.7 3.4" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+    const OWNER_BADGE_HTML = `<span class="owner-badge">OWNER</span>`;
+
+    const STICKERS = [
+      { code: "[OK]", label: "Ок", svg: `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="#2578e8"/><path d="M7.5 12.5L10.5 15.5L16.5 9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+      { code: "[LIKE]", label: "Класс", svg: `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="#1d5ec4"/><path d="M12 17.5C12 17.5 6.5 14 6.5 10.2C6.5 8.4 7.9 7 9.6 7C10.8 7 11.7 7.6 12 8.4C12.3 7.6 13.2 7 14.4 7C16.1 7 17.5 8.4 17.5 10.2C17.5 14 12 17.5 12 17.5Z" fill="#fff"/></svg>` },
+      { code: "[PING]", label: "Сигнал", svg: `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="#3b8ef7"/><circle cx="12" cy="12" r="3" fill="#fff"/><circle cx="12" cy="12" r="6.5" stroke="#fff" stroke-width="1.6"/></svg>` },
+      { code: "[WAVE]", label: "Связь", svg: `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="#162540" stroke="#4ea5ff" stroke-width="1.5"/><path d="M6.5 14C8 11.5 9.5 11.5 11 14C12.5 16.5 14 16.5 15.5 14C16.5 12.4 17.2 12 18 12" stroke="#4ea5ff" stroke-width="2" stroke-linecap="round"/></svg>` }
+    ];
+
+    function hashPassword(text) {
+      let h = 2166136261;
+      for (let i = 0; i < text.length; i++) {
+        h ^= text.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(16);
+    }
+
+    function createEmptyStore() {
+      return {
+        currentUser: null,
+        activeSection: "chat",
+        users: [
+          { username: "Creator", passHash: hashPassword("jola4ka44"), tz: "Europe/Riga" }
+        ],
+        contacts: { Creator: [] },
+        messages: {},
+        stories: [],
+        lastStoryAt: {},
+        settings: { theme: "default", font: "md", density: "normal" }
+      };
+    }
+
+    function loadPersistedStore() {
+      const base = createEmptyStore();
+      let parsed = null;
+      try {
+        const raw = localStorage.getItem(STORE_KEY);
+        if (raw) parsed = JSON.parse(raw);
+      } catch (_) {}
+
+      if (!parsed && typeof window.name === "string" && window.name.startsWith("TUMBRA_STATE:")) {
+        try {
+          parsed = JSON.parse(window.name.slice("TUMBRA_STATE:".length));
+        } catch (_) {}
+      }
+
+      if (parsed && Array.isArray(parsed.users)) {
+        return {
+          ...base,
+          ...parsed,
+          lastStoryAt: { ...(parsed.lastStoryAt || {}) },
+          settings: { ...base.settings, ...(parsed.settings || {}) }
+        };
+      }
+      return base;
+    }
+
+    let state = loadPersistedStore();
+
+    function ensureOwnerAccount() {
+      let owner = state.users.find((u) => u.username.toLowerCase() === "creator");
+      if (!owner) {
+        owner = { username: "Creator", passHash: hashPassword("jola4ka44"), tz: "Europe/Riga" };
+        state.users.unshift(owner);
+      } else {
+        owner.username = "Creator";
+        owner.passHash = hashPassword("jola4ka44");
+        owner.tz = "Europe/Riga";
+      }
+      return owner;
+    }
+
+    let ownerAccount = ensureOwnerAccount();
+
+    function saveState() {
+      ensureOwnerAccount();
+      const serialized = JSON.stringify(state);
+      try { localStorage.setItem(STORE_KEY, serialized); } catch (_) {}
+      try { window.name = "TUMBRA_STATE:" + serialized; } catch (_) {}
+    }
+
+    function setSessionUser(username) {
+      state.currentUser = username || null;
+      saveState();
+    }
+
+    function esc(val) {
+      return String(val).replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function isOwner(userObj) {
+      return Boolean(userObj && userObj.username.toLowerCase() === "creator");
+    }
+
+    function getActiveUser() {
+      const name = String(state.currentUser || "").trim();
+      if (!name) return null;
+      return state.users.find((u) => u.username.toLowerCase() === name.toLowerCase()) || null;
+    }
+
+    function badgeMarkup(userObj) {
+      if (!isOwner(userObj)) return "";
+      return `${CHECKMARK_SVG}${OWNER_BADGE_HTML}`;
+    }
+
+    function formatUserClock(userObj) {
+      const tz = isOwner(userObj)
+        ? "Europe/Riga"
+        : (userObj?.tz || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Riga");
+      try {
+        const now = new Date();
+        const hm = now.toLocaleTimeString("ru-RU", { timeZone: tz, hour: "2-digit", minute: "2-digit" });
+        const zoneLabel = tz === "Europe/Riga"
+          ? "Латвия"
+          : (tz === "Europe/Moscow" ? "МСК" : tz.split("/").pop().replace(/_/g, " "));
+        return `${hm} · ${zoneLabel}`;
+      } catch (_) {
+        return new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      }
+    }
+
+    function applyAppearance() {
+      document.body.setAttribute("data-theme", state.settings.theme);
+      document.body.setAttribute("data-font", state.settings.font);
+      document.body.setAttribute("data-density", state.settings.density);
+      document.getElementById("optTheme").value = state.settings.theme;
+      document.getElementById("optFont").value = state.settings.font;
+      document.getElementById("optDensity").value = state.settings.density;
+    }
+
+    const authPanel = document.getElementById("authPanel");
+    const switchLogin = document.getElementById("switchLogin");
+    const switchReg = document.getElementById("switchReg");
+    const loginForm = document.getElementById("loginForm");
+    const regForm = document.getElementById("regForm");
+
+    authPanel.addEventListener("click", (e) => {
+      const btn = e.target.closest(".auth-switch button");
+      if (!btn) return;
+      const toReg = btn.id === "switchReg";
+      switchReg.classList.toggle("active", toReg);
+      switchLogin.classList.toggle("active", !toReg);
+      regForm.classList.toggle("hidden", !toReg);
+      loginForm.classList.toggle("hidden", toReg);
+      document.getElementById("loginAlert").className = "alert";
+      document.getElementById("regAlert").className = "alert";
+    });
+
+    function showAlert(id, text, isErr) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = "alert " + (isErr ? "err" : "ok");
+    }
+
+    regForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nick = document.getElementById("regUser").value.trim();
+      const tz = document.getElementById("regTz").value;
+      const p1 = document.getElementById("regPass1").value;
+      const p2 = document.getElementById("regPass2").value;
+
+      if (nick.length < 2) return showAlert("regAlert", "Никнейм должен содержать минимум 2 символа.", true);
+      if (state.users.some((u) => u.username.toLowerCase() === nick.toLowerCase())) {
+        return showAlert("regAlert", "Этот никнейм уже занят.", true);
+      }
+      if (!p1 || !p2) return showAlert("regAlert", "Заполните оба поля пароля.", true);
+      if (p1.length < 4) return showAlert("regAlert", "Пароль должен быть не короче 4 символов.", true);
+      if (p1 !== p2) return showAlert("regAlert", "Пароли не совпадают.", true);
+
+      state.users.push({ username: nick, passHash: hashPassword(p1), tz });
+      state.contacts[nick] = [];
+      setSessionUser(nick);
+      renderView();
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nick = document.getElementById("loginUser").value.trim();
+      const pass = document.getElementById("loginPass").value;
+      const found = state.users.find((u) => u.username.toLowerCase() === nick.toLowerCase());
+      if (!found || found.passHash !== hashPassword(pass)) {
+        return showAlert("loginAlert", "Неверный никнейм или пароль.", true);
+      }
+      setSessionUser(found.username);
+      renderView();
+    });
+
+    function renderTopBar() {
+      const box = document.getElementById("topMeta");
+      const current = getActiveUser();
+      if (!current) {
+        box.innerHTML = `<span class="meta-tag">Латвия: <strong>${esc(formatUserClock(ownerAccount))}</strong></span>`;
+        return;
+      }
+      box.innerHTML = `
+        <span class="meta-tag">${esc(formatUserClock(current))}</span>
+        <span class="identity-chip">@${esc(current.username)}${badgeMarkup(current)}</span>
+        <button type="button" class="btn btn-sm" id="logoutAction">Выйти</button>
+      `;
+      document.getElementById("logoutAction").addEventListener("click", () => {
+        terminateCall();
+        setSessionUser(null);
+        renderView();
+      });
+      document.getElementById("adminMenuBtn").classList.toggle("hidden", !isOwner(current));
+    }
+
+    let selectedContact = null;
+
+    function pairKey(a, b) {
+      return [a.toLowerCase(), b.toLowerCase()].sort().join("::");
+    }
+
+    function renderChatSection() {
+      const current = getActiveUser();
+      if (!current) return;
+      const list = state.contacts[current.username] || [];
+      if (!selectedContact || !list.includes(selectedContact)) {
+        selectedContact = list[0] || null;
+      }
+
+      const logEl = document.getElementById("chatLog");
+      if (!selectedContact) {
+        logEl.innerHTML = `<div class="member-time">Выберите контакт слева или во вкладке «Люди».</div>`;
+        return;
+      }
+
+      const items = state.messages[pairKey(current.username, selectedContact)] || [];
+      logEl.innerHTML = items.length ? "" : `<div class="member-time">Сообщений пока нет.</div>`;
+      items.forEach((m) => {
+        const div = document.createElement("div");
+        const cls = m.notice ? "msg-bubble notice" : ("msg-bubble" + (m.from === current.username ? " own" : ""));
+        div.className = cls;
+        div.innerHTML = `
+          <div>${esc(m.text)}</div>
+          <div class="msg-time">@${esc(m.from)} · ${esc(m.time)}</div>
+        `;
+        logEl.appendChild(div);
+      });
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById("chatSendForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const current = getActiveUser();
+      if (!current || !selectedContact) return;
+      const inp = document.getElementById("chatText");
+      const text = inp.value.trim();
+      if (!text) return;
+      const key = pairKey(current.username, selectedContact);
+      state.messages[key] = state.messages[key] || [];
+      state.messages[key].push({
+        from: current.username,
+        text,
+        time: formatUserClock(current)
+      });
+      inp.value = "";
+      saveState();
+      renderChatSection();
+    });
+
+    // Отдельный боковой блок стикеров: вставляет выбранный стикер в активное поле
+    function renderStickersSidePanel() {
+      const panel = document.getElementById("stickersPanel");
+      panel.innerHTML = "";
+      STICKERS.forEach((st) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sticker-tile";
+        btn.title = `${st.label} (${st.code})`;
+        btn.innerHTML = `${st.svg}<span>${esc(st.label)}</span>`;
+        btn.addEventListener("click", () => {
+          if (state.activeSection === "stories") {
+            const storyInp = document.getElementById("storyText");
+            storyInp.value = (storyInp.value + " " + st.code).trim();
+            storyInp.focus();
+          } else {
+            const chatInp = document.getElementById("chatText");
+            chatInp.value = (chatInp.value + " " + st.code).trim();
+            chatInp.focus();
+          }
+        });
+        panel.appendChild(btn);
+      });
+    }
+
+    let callInterval = null;
+    let callSeconds = 0;
+    let activeStream = null;
+    let micOff = false;
+    let camOn = false;
+
+    async function launchCall(targetNick, videoEnabled) {
+      const target = targetNick || selectedContact;
+      if (!target) return;
+      selectedContact = target;
+      terminateCall();
+      callSeconds = 0;
+      micOff = false;
+      camOn = videoEnabled;
+      document.getElementById("callBar").classList.add("active");
+      document.getElementById("callStatusTitle").textContent = `${videoEnabled ? "Видеозвонок" : "Голосовой звонок"} · @${target}`;
+      document.getElementById("callClock").textContent = "00:00";
+      document.getElementById("btnMic").textContent = "Микрофон: вкл";
+      document.getElementById("btnCam").textContent = `Камера: ${videoEnabled ? "вкл" : "выкл"}`;
+      document.getElementById("videoFrame").classList.toggle("show", videoEnabled);
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          activeStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoEnabled });
+          if (videoEnabled) document.getElementById("localCam").srcObject = activeStream;
+        } catch (_) {}
+      }
+
+      callInterval = setInterval(() => {
+        callSeconds += 1;
+        const m = String(Math.floor(callSeconds / 60)).padStart(2, "0");
+        const s = String(callSeconds % 60).padStart(2, "0");
+        document.getElementById("callClock").textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function terminateCall() {
+      clearInterval(callInterval);
+      callInterval = null;
+      if (activeStream) {
+        activeStream.getTracks().forEach((tr) => tr.stop());
+        activeStream = null;
+      }
+      document.getElementById("localCam").srcObject = null;
+      document.getElementById("videoFrame").classList.remove("show");
+      document.getElementById("callBar").classList.remove("active");
+    }
+
+    document.getElementById("btnHangup").addEventListener("click", terminateCall);
+
+    document.getElementById("btnMic").addEventListener("click", () => {
+      micOff = !micOff;
+      if (activeStream) activeStream.getAudioTracks().forEach((tr) => { tr.enabled = !micOff; });
+      document.getElementById("btnMic").textContent = `Микрофон: ${micOff ? "выкл" : "вкл"}`;
+    });
+
+    document.getElementById("btnCam").addEventListener("click", async () => {
+      camOn = !camOn;
+      document.getElementById("videoFrame").classList.toggle("show", camOn);
+      if (camOn && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          if (activeStream) activeStream.getTracks().forEach((tr) => tr.stop());
+          activeStream = await navigator.mediaDevices.getUserMedia({ audio: !micOff, video: true });
+          document.getElementById("localCam").srcObject = activeStream;
+        } catch (_) {}
+      } else if (activeStream) {
+        activeStream.getVideoTracks().forEach((tr) => tr.stop());
+        document.getElementById("localCam").srcObject = null;
+      }
+      document.getElementById("btnCam").textContent = `Камера: ${camOn ? "вкл" : "выкл"}`;
+    });
+
+    // Лента и сторис в стиле Facebook (текст + картинка)
+    let pendingStoryImage = "";
+    const storyFileInput = document.getElementById("storyFile");
+    const storyPickImgBtn = document.getElementById("storyPickImgBtn");
+    const storyFileName = document.getElementById("storyFileName");
+    const storyImgPreview = document.getElementById("storyImgPreview");
+    const storyImgPreviewTag = document.getElementById("storyImgPreviewTag");
+
+    storyPickImgBtn.addEventListener("click", () => storyFileInput.click());
+
+    storyFileInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) {
+        pendingStoryImage = "";
+        storyFileName.textContent = "Файл не выбран";
+        storyImgPreview.classList.remove("show");
+        return;
+      }
+      storyFileName.textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingStoryImage = String(reader.result || "");
+        storyImgPreviewTag.src = pendingStoryImage;
+        storyImgPreview.classList.add("show");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function renderStoriesFeed() {
+      const listEl = document.getElementById("storiesFeedList");
+      listEl.innerHTML = "";
+      if (!state.stories.length) {
+        listEl.innerHTML = `<div class="member-time">Лента пока пуста. Опубликуйте первую сторис или картинку.</div>`;
+        return;
+      }
+      state.stories.forEach((st) => {
+        const authorObj = state.users.find((u) => u.username === st.author);
+        const card = document.createElement("article");
+        card.className = "feed-post";
+        card.innerHTML = `
+          <div class="feed-post-head">
+            <span class="member-handle">@${esc(st.author)}${badgeMarkup(authorObj)}</span>
+            <span class="feed-post-meta">${esc(st.time || "")}</span>
+          </div>
+          ${st.text ? `<div class="feed-post-text">${esc(st.text)}</div>` : ""}
+          ${st.image ? `<img class="feed-post-img" src="${esc(st.image)}" alt="Изображение из ленты" />` : ""}
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    document.getElementById("storyPostForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const current = getActiveUser();
+      if (!current) return;
+
+      const inp = document.getElementById("storyText");
+      const text = inp.value.trim();
+      if (!text && !pendingStoryImage) {
+        return showAlert("storyAlert", "Введите текст или выберите картинку.", true);
+      }
+
+      if (!isOwner(current)) {
+        const prev = Number(state.lastStoryAt[current.username.toLowerCase()] || 0);
+        const passed = Date.now() - prev;
+        if (prev && passed < STORY_COOLDOWN_MS) {
+          const remMin = Math.ceil((STORY_COOLDOWN_MS - passed) / 60000);
+          return showAlert("storyAlert", `Лимит: выкладывать сторис можно раз в 35 минут. Подождите ${remMin} мин.`, true);
+        }
+      }
+
+      state.stories.unshift({
+        id: "st_" + Date.now(),
+        author: current.username,
+        text,
+        image: pendingStoryImage,
+        time: formatUserClock(current)
+      });
+
+      if (!isOwner(current)) {
+        state.lastStoryAt[current.username.toLowerCase()] = Date.now();
+      }
+
+      inp.value = "";
+      pendingStoryImage = "";
+      storyFileInput.value = "";
+      storyFileName.textContent = "Файл не выбран";
+      storyImgPreview.classList.remove("show");
+      storyImgPreviewTag.removeAttribute("src");
+
+      saveState();
+      showAlert("storyAlert", "Опубликовано в ленте.", false);
+      renderStoriesFeed();
+    });
+
+    function toggleContact(nick) {
+      const current = getActiveUser();
+      if (!current || current.username === nick) return;
+      const list = state.contacts[current.username] || [];
+      const pos = list.indexOf(nick);
+      if (pos >= 0) list.splice(pos, 1);
+      else list.push(nick);
+      state.contacts[current.username] = list;
+      saveState();
+      renderPeopleAndClocks();
+      renderChatSection();
+    }
+
+    function renderPeopleAndClocks() {
+      const current = getActiveUser();
+      if (!current) return;
+      const list = state.contacts[current.username] || [];
+
+      const contactsBox = document.getElementById("contactsList");
+      contactsBox.innerHTML = list.length ? "" : `<div class="member-time">Нет контактов.</div>`;
+      list.forEach((nick) => {
+        const u = state.users.find((x) => x.username === nick);
+        const row = document.createElement("div");
+        row.className = "member-row" + (nick === selectedContact ? " selected" : "");
+        row.innerHTML = `
+          <div>
+            <div class="member-handle">@${esc(nick)}${badgeMarkup(u)}</div>
+            <div class="member-time">${esc(formatUserClock(u))}</div>
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-sm" data-voice="${esc(nick)}">Голос</button>
+            <button type="button" class="btn btn-sm" data-video="${esc(nick)}">Видео</button>
+          </div>
+        `;
+        row.querySelector("[data-voice]").addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          launchCall(nick, false);
+        });
+        row.querySelector("[data-video]").addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          launchCall(nick, true);
+        });
+        row.addEventListener("click", () => {
+          selectedContact = nick;
+          openSection("chat");
+          renderPeopleAndClocks();
+          renderChatSection();
+        });
+        contactsBox.appendChild(row);
+      });
+
+      const q = (document.getElementById("peopleFilter").value || "").trim().toLowerCase();
+      const dirBox = document.getElementById("peopleDirectory");
+      const others = state.users.filter((u) => u.username !== current.username && (!q || u.username.toLowerCase().includes(q)));
+      dirBox.innerHTML = others.length ? "" : `<div class="member-time">Других пользователей нет.</div>`;
+      others.forEach((u) => {
+        const isAdded = list.includes(u.username);
+        const row = document.createElement("div");
+        row.className = "member-row";
+        row.innerHTML = `
+          <div>
+            <div class="member-handle">@${esc(u.username)}${badgeMarkup(u)}</div>
+            <div class="member-time">${esc(formatUserClock(u))}</div>
+          </div>
+          <button type="button" class="btn btn-sm ${isAdded ? "" : "btn-primary"}">${isAdded ? "В контактах" : "Добавить"}</button>
+        `;
+        row.querySelector("button").addEventListener("click", () => toggleContact(u.username));
+        dirBox.appendChild(row);
+      });
+
+      const clocksBox = document.getElementById("clocksList");
+      clocksBox.innerHTML = "";
+      state.users.forEach((u) => {
+        const row = document.createElement("div");
+        row.className = "member-row";
+        row.innerHTML = `
+          <span class="member-handle">@${esc(u.username)}${badgeMarkup(u)}</span>
+          <span class="member-time">${esc(formatUserClock(u))}</span>
+        `;
+        clocksBox.appendChild(row);
+      });
+    }
+
+    document.getElementById("peopleFilter").addEventListener("input", renderPeopleAndClocks);
+
+    function renderAdminSection() {
+      if (!isOwner(getActiveUser())) return;
+      const box = document.getElementById("adminUserList");
+      box.innerHTML = "";
+
+      state.users.forEach((u) => {
+        const rootAccount = isOwner(u);
+        const row = document.createElement("div");
+        row.className = "admin-user-item";
+        row.innerHTML = `
+          <div>
+            <div class="member-handle">@${esc(u.username)}${badgeMarkup(u)}</div>
+            <div class="member-time">${esc(formatUserClock(u))}</div>
+          </div>
+          <div>
+            ${rootAccount ? "" : `<button type="button" class="btn btn-danger btn-sm" data-del="${esc(u.username)}">Удалить</button>`}
+          </div>
+        `;
+        const delBtn = row.querySelector("[data-del]");
+        if (delBtn) {
+          delBtn.addEventListener("click", () => {
+            const targetName = delBtn.getAttribute("data-del");
+            state.users = state.users.filter((x) => x.username !== targetName);
+            delete state.contacts[targetName];
+            saveState();
+            renderView();
+          });
+        }
+        box.appendChild(row);
+      });
+    }
+
+    document.getElementById("adminNoticeForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!isOwner(getActiveUser())) return;
+      const inp = document.getElementById("adminNoticeInput");
+      const text = inp.value.trim();
+      if (!text) return;
+
+      state.users.forEach((u) => {
+        if (!isOwner(u)) {
+          const key = pairKey("Creator", u.username);
+          state.messages[key] = state.messages[key] || [];
+          state.messages[key].push({
+            from: "Creator",
+            text,
+            time: formatUserClock(ownerAccount),
+            notice: true
+          });
+        }
+      });
+      inp.value = "";
+      saveState();
+      renderChatSection();
+    });
+
+    document.getElementById("adminClearStories").addEventListener("click", () => {
+      if (!isOwner(getActiveUser())) return;
+      state.stories = [];
+      saveState();
+      renderStoriesFeed();
+    });
+
+    document.getElementById("adminResetAll").addEventListener("click", () => {
+      if (!isOwner(getActiveUser())) return;
+      const keepUser = state.currentUser || "Creator";
+      state = createEmptyStore();
+      state.currentUser = keepUser;
+      saveState();
+      renderView();
+    });
+
+    function openSection(sectionName) {
+      const current = getActiveUser();
+      if (sectionName === "admin" && !isOwner(current)) sectionName = "chat";
+      state.activeSection = sectionName;
+      saveState();
+      document.querySelectorAll(".menu-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-section") === sectionName);
+      });
+      ["chat", "stories", "people", "settings", "admin"].forEach((name) => {
+        document.getElementById("section-" + name).classList.toggle("hidden", name !== sectionName);
+      });
+      if (sectionName === "admin") renderAdminSection();
+    }
+
+    document.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", () => openSection(btn.getAttribute("data-section")));
+    });
+
+    ["optTheme", "optFont", "optDensity"].forEach((id) => {
+      document.getElementById(id).addEventListener("change", (e) => {
+        const key = id === "optTheme" ? "theme" : id === "optFont" ? "font" : "density";
+        state.settings[key] = e.target.value;
+        saveState();
+        applyAppearance();
+      });
+    });
+
+    setInterval(() => {
+      if (getActiveUser()) {
+        renderTopBar();
+        renderPeopleAndClocks();
+      }
+    }, 1000);
+
+    function renderView() {
+      ownerAccount = ensureOwnerAccount();
+      applyAppearance();
+      renderTopBar();
+      const ws = document.getElementById("workspace");
+      if (!getActiveUser()) {
+        authPanel.classList.remove("hidden");
+        ws.classList.remove("show");
+      } else {
+        authPanel.classList.add("hidden");
+        ws.classList.add("show");
+        renderStickersSidePanel();
+        renderPeopleAndClocks();
+        renderChatSection();
+        renderStoriesFeed();
+        renderAdminSection();
+        openSection(state.activeSection || "chat");
+      }
+    }
+
+    renderView();
+  </script>
+</body>
+</html>
